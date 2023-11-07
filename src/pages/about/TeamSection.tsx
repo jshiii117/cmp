@@ -89,7 +89,7 @@ const teamMembers = [
     degree: "2nd Year",
     role: "2nd Year Rep",
     avatar:
-      "https://media.licdn.com/dms/image/D4D03AQFRP1dOwowO8g/profile-displayphoto-shrink_800_800/0/1698945344840?e=1704326400&v=beta&t=LxDWGeVhwfm4w6114bm_HNCDxLjOQh-VBHdHKwO6enA",
+      "https://media.licdn.com/dms/image/D5603AQHguaiFiBNO_A/profile-displayphoto-shrink_800_800/0/1699257877687?e=1704931200&v=beta&t=OxX_J54NRcdkSzPqJd27cwcsoJ0peG0jlWDayLhbimM",
     linkedin: "https://www.linkedin.com/in/andeeachacoso/",
   },
   {

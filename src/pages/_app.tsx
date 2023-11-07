@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @next/next/no-img-element */
+import { Analytics } from "@vercel/analytics/react";
 import { type AppProps } from "next/app";
 import {
   type Event,
@@ -104,7 +105,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     <>
       <div className="z-40 overflow-clip bg-slate-50">
         {/* Navbar */}
-        <nav className=" bg-transparent p-4">
+        <nav className="bg-transparent p-4">
           <div className="container mx-auto flex items-center justify-between">
             {/* Logo */}
 
@@ -163,6 +164,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         <div className="flex min-h-screen flex-grow flex-col justify-center ">
           <div className="flex-grow">
             <Component {...pageProps} globalData={globalData} />
+            <Analytics />
           </div>
           {/* Footer */}
           <footer className="border-t border-gray-700 bg-gray-900 p-8 text-white">

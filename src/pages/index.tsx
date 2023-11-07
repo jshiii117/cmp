@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { type Event, type ReviewSession } from "~/types";
@@ -54,8 +55,8 @@ export default function Home({ globalData }: HomeProps) {
       </Head>
       <main className="flex flex-col items-center justify-center">
         {/* Hero Section */}
-        <section className="xs:-mt-0 container relative mt-16 flex h-screen flex-grow flex-col-reverse items-center  justify-center lg:-mt-16  lg:flex-row ">
-          <div className="area">
+        <section className="xs:-mt-0 container relative mt-16 flex h-screen flex-grow flex-col-reverse items-center  justify-center lg:-mt-16 lg:flex-row">
+          <div className="area h-screen">
             <ul className="circles">
               <li></li>
               <li></li>
@@ -120,7 +121,7 @@ export default function Home({ globalData }: HomeProps) {
             <img
               src="/review-explorer.png"
               alt="Rectangular Image"
-              className="h-auto w-full object-contain md:h-auto md:w-auto"
+              className="h-auto w-auto sm:max-h-[359.91px] sm:max-w-[610px]"
             />
           </div>
         </section>
