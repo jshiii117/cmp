@@ -6,7 +6,12 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   try {
-    const files = await getFilesInFolder(process.env.GOOGLE_DRIVE_ID!);
+    const { folderId } = req.query;
+    if (typeof folderId !== "string") {
+      res.status(400).json({ message: "Invalid folder ID" });
+      return;
+    }
+    const files = await getFilesInFolder(folderId);
     res.status(200).json(files);
   } catch (error) {
     console.error(error);

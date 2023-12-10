@@ -9,6 +9,7 @@ const FOLDER_ICON = "📁";
 const FILE_ICON = "📄";
 
 interface Folder {
+  id: string;
   name: string;
   link: string;
   type: "folder";
@@ -26,59 +27,42 @@ export default function Review() {
   const [history, setHistory] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function initialGDriveFetch() {
-      const loadingTimeout = setTimeout(() => {
-        setLoading(false);
-      }, 20000);
+  async function fetchFolderData(folderId: string) {
+    const loadingTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 20000);
 
-      try {
-        // Attempt to retrieve data from local storage
-        const cachedData = localStorage.getItem("gDriveData");
-        const cachedTimestamp = localStorage.getItem("gDriveTimestamp");
-
-        if (
-          cachedData &&
-          cachedTimestamp &&
-          Date.now() - Number(cachedTimestamp) < 5 * 60 * 1000
-        ) {
-          const parsedData = JSON.parse(cachedData);
-          setData(parsedData);
-          setHistory([parsedData]);
-
-          if (process.env.NODE_ENV === "development") {
-            console.log("Using cached for gdrive");
-          }
-        } else {
-          // Fetch the data from the API
-          const res = await fetch("/api/getFiles");
-          if (!res.ok) {
-            throw new Error("Error fetching data");
-          }
-          const initialData = await res.json();
-
-          // Store the data in local storage
-          localStorage.setItem("gDriveData", JSON.stringify(initialData));
-          localStorage.setItem("gDriveTimestamp", Date.now().toString());
-
-          setData(initialData);
-          setHistory([initialData]);
-        }
-
-        setLoading(false);
-        clearTimeout(loadingTimeout);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setHistory([]);
-        setLoading(false);
-        clearTimeout(loadingTimeout);
+    try {
+      const res = await fetch(`/api/getFiles?folderId=${folderId}`);
+      if (!res.ok) {
+        throw new Error("Error fetching folder data");
       }
-    }
+      const folderData: Folder = await res.json();
 
-    void initialGDriveFetch();
+      localStorage.setItem(
+        `gDriveData_${folderId}`,
+        JSON.stringify(folderData),
+      );
+
+      setData(folderData);
+      setHistory((prev) => [...prev, folderData]);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching folder data:", error);
+      setHistory([]);
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void fetchFolderData("initial");
   }, []);
 
   function handleFolderLevelClick(folder: Folder, level: number) {
+    console.log("FOLDER:", folder);
+    setLoading(true);
+    void fetchFolderData(folder.id);
+    // Update history by replacing subsequent levels and retaining previous levels
     setHistory((prev) => [...prev.slice(0, level), folder]);
     setData(folder);
   }
@@ -89,6 +73,14 @@ export default function Review() {
 
   return (
     <>
+      <button
+        onClick={() => {
+          console.log("DATA:", data);
+          console.log("HIERARCHY:", history);
+        }}
+      >
+        Log Data
+      </button>
       <Head>
         <title>Review Packages | Commerce Mentorship Program</title>
         <meta
