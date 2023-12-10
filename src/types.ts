@@ -54,3 +54,17 @@ export interface ReviewSession {
   date: string;
   academicConsultant: string;
 }
+
+export interface Folder {
+  id: string;
+  name: string;
+  link: string;
+  type: "folder";
+  children: (Folder | File)[];
+}
+
+export interface File {
+  name: string;
+  link: string;
+  type: "file";
+}

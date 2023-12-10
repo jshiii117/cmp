@@ -9,25 +9,13 @@ const auth = new GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
 
+import { type Folder, File } from "./types";
+
 const drive = google.drive({ version: "v3", auth });
-
-interface Folder {
-  id: string;
-  name: string;
-  link: string;
-  children: (Folder | File)[];
-  type: "folder";
-}
-
-interface File {
-  name: string;
-  link: string;
-  type: "file";
-}
 
 export async function getFilesInFolder(folderId: string): Promise<Folder> {
   if (folderId == "initial") {
-    folderId = process.env.GOOGLE_DRIVE_FOLDER_ID!;
+    folderId = process.env.GOOGLE_DRIVE_ID!;
   }
 
   try {

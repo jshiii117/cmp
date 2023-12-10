@@ -4,23 +4,10 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { type Folder, type File } from "../../types";
 
 const FOLDER_ICON = "📁";
 const FILE_ICON = "📄";
-
-interface Folder {
-  id: string;
-  name: string;
-  link: string;
-  type: "folder";
-  children: (Folder | File)[];
-}
-
-interface File {
-  name: string;
-  link: string;
-  type: "file";
-}
 
 export default function Review() {
   const [data, setData] = useState<Folder | null>(null);
