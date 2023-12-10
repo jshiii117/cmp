@@ -9,7 +9,7 @@ const auth = new GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
 
-import { type Folder, File } from "./types";
+import { type Folder } from "./types";
 
 const drive = google.drive({ version: "v3", auth });
 
@@ -32,7 +32,7 @@ export async function getFilesInFolder(folderId: string): Promise<Folder> {
 
     const folder: Folder = {
       id: folderId,
-      name: "here/?",
+      name: "", //temp fix in index.tsx
       link: "",
       type: "folder",
       children: [],

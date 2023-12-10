@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -8,31 +9,58 @@ import { type Folder, type File } from "../../types";
 
 const FOLDER_ICON = "📁";
 const FILE_ICON = "📄";
+const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour
 
 export default function Review() {
   const [data, setData] = useState<Folder | null>(null);
   const [history, setHistory] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function fetchFolderData(folderId: string) {
-    const loadingTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 20000);
+  async function fetchFolderData(
+    folderId: string,
+    folderName: string,
+    level: number,
+  ) {
+    setLoading(true);
 
     try {
+      const cachedData = localStorage.getItem(`gDriveData_${folderId}`);
+      const cachedTimestamp = localStorage.getItem(
+        `gDriveDataTimestamp_${folderId}`,
+      );
+
+      if (cachedData && cachedTimestamp) {
+        const currentTime = new Date().getTime();
+        const parsedTimestamp = parseInt(cachedTimestamp, 10);
+
+        if (currentTime - parsedTimestamp < CACHE_EXPIRATION_TIME) {
+          const parsedData: Folder = JSON.parse(cachedData);
+          setData(parsedData);
+          setHistory((prev) => [...prev.slice(0, level), parsedData]);
+          setLoading(false);
+          return;
+        }
+      }
+
       const res = await fetch(`/api/getFiles?folderId=${folderId}`);
       if (!res.ok) {
         throw new Error("Error fetching folder data");
       }
+
       const folderData: Folder = await res.json();
+      folderData.name = folderName;
 
       localStorage.setItem(
         `gDriveData_${folderId}`,
         JSON.stringify(folderData),
       );
+      localStorage.setItem(
+        `gDriveDataTimestamp_${folderId}`,
+        String(new Date().getTime()),
+      );
 
       setData(folderData);
-      setHistory((prev) => [...prev, folderData]);
+      setHistory((prev) => [...prev.slice(0, level), folderData]);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching folder data:", error);
@@ -42,17 +70,8 @@ export default function Review() {
   }
 
   useEffect(() => {
-    void fetchFolderData("initial");
+    void fetchFolderData("initial", "Review Packages Dec 2023", 1);
   }, []);
-
-  function handleFolderLevelClick(folder: Folder, level: number) {
-    console.log("FOLDER:", folder);
-    setLoading(true);
-    void fetchFolderData(folder.id);
-    // Update history by replacing subsequent levels and retaining previous levels
-    setHistory((prev) => [...prev.slice(0, level), folder]);
-    setData(folder);
-  }
 
   function handleFileClick(file: File) {
     window.open(file.link, "_blank");
@@ -60,14 +79,6 @@ export default function Review() {
 
   return (
     <>
-      <button
-        onClick={() => {
-          console.log("DATA:", data);
-          console.log("HIERARCHY:", history);
-        }}
-      >
-        Log Data
-      </button>
       <Head>
         <title>Review Packages | Commerce Mentorship Program</title>
         <meta
@@ -110,7 +121,7 @@ export default function Review() {
                           key={index}
                           onClick={() =>
                             child.type === "folder"
-                              ? handleFolderLevelClick(child, level + 1)
+                              ? fetchFolderData(child.id, child.name, level + 1)
                               : handleFileClick(child)
                           }
                           className={`
